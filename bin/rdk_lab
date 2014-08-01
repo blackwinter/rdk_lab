@@ -1,0 +1,53 @@
+#! /usr/bin/env ruby
+
+require 'rdk_lab'
+require 'fileutils'
+
+def api(login = true)
+  yield RDKLab::API.new(login)
+rescue SocketError, MediaWiki::Exception => err
+  abort err.to_s
+end
+
+case ARGV.size
+  when 0
+    api { |mw| RDKLab::Article.create(mw) }
+  when 1
+    case arg = ARGV.first
+      when '--sys'
+        api { |mw| RDKLab::Cat.create(mw) }
+      when '--delete-sys'
+        api { |mw| RDKLab::Cat.delete(mw) }
+      when '--img'
+        api { |mw| RDKLab::Img.create(mw) }
+      when '--delete-img'
+        api { |mw| RDKLab::Img.delete(mw) }
+      when '--put'
+        api { |mw| RDKLab::Article.each { |article|
+          if File.size?(path = File.join('txt', "#{article.name}.txt"))
+            puts "#{article.title} <- #{path}"
+            article.body = File.read(path)
+          else
+            puts article.title
+          end
+
+          article.create(mw)
+        } }
+      when '--txt'
+        RDKLab::Article.each { |article|
+          FileUtils.mkdir_p(dir = 'txt')
+          next if File.size?(path = File.join(dir, "#{article.name}.txt"))
+
+          puts "#{article.title} -> #{path}"
+          File.write(path, article.to_s)
+        }
+      when '--lst'
+        RDKLab::Article.each { |article| p article }
+      when /\A--/
+        abort "Unknown option: #{arg}"
+      else
+        puts RDKLab::Article[arg]
+    end
+  else
+    ARGV.each { |arg| puts RDKLab::Article[arg] }
+end

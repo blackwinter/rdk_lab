@@ -1,0 +1,44 @@
+= rdk_lab - RDK-SMW tools
+
+== VERSION
+
+This documentation refers to rdk_lab version 0.9.0.
+
+
+== DESCRIPTION
+
+Tooling for the Semantic MediaWiki implementation of the German art
+history encyclopedia. Developed and applied during the migration of
+{RDK Web}[http://rdk-web.de], a Greenstone[http://greenstone.org/]
+digital library application, to {RDK Labor}[http://zikg.eu/forschung/forschungsstelle-realienkunde/rdk-labor],
+a {Semantic MediaWiki}[https://semantic-mediawiki.org/] application.
+
+
+== LINKS
+
+Homepage::    http://zikg.eu/forschung/forschungsstelle-realienkunde/rdk-labor
+Prototype::   http://ixtrieve.fh-koeln.de/rdk-smw
+Source code:: https://github.com/blackwinter/rdk_lab
+
+
+== AUTHORS
+
+* Jens Wille <mailto:jens.wille@gmail.com>
+
+
+== LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2014 Jens Wille
+
+rdk_lab is free software: you can redistribute it and/or modify it
+under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+rdk_lab is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with rdk_lab. If not, see <http://www.gnu.org/licenses/>.

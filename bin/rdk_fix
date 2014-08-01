@@ -1,0 +1,37 @@
+#! /usr/bin/env ruby
+
+require 'rdk_lab'
+
+fix, file, rest = ARGV
+abort "Usage: #{$0} <fix> [<file>]" if !fix || rest
+
+RDKLab::FixUp.setup(file) if file
+
+# fail early
+RDKLab::FixUp.fixup(fix)
+
+api, num = RDKLab::API.get(true), 0
+
+block = lambda { |title, redirect, match, prematch, redirect_content|
+  puts "\n#{title} -> #{redirect}"
+  api.edit(title, match, summary: fix)
+
+  !redirect_content ? puts("#{redirect}: missing!") :
+    api.edit(redirect, redirect_content.prepend(prematch), summary: fix)
+} if fix == 'cleanup: redirect'
+
+titles, redirects = api.allcontents(&block)
+
+%w[Hauptseite UNTITLED].each { |title| titles.delete(title) }
+
+titles.each { |title, content|
+  if RDKLab::FixUp.fixup(fix, content, title)
+    redirect = redirects[title]
+    puts "#{num += 1}) #{title}#{" [#{redirect.join(' | ')}]" if redirect}"
+    api.edit(title, content, summary: "fixup: #{fix}")
+  end
+}
+
+redirects.each { |redirect, val| val.each { |title|
+  puts "#{title} -> #{redirect}#{' [BROKEN]' unless titles.key?(redirect)}"
+} }
