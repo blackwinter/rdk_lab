@@ -34,7 +34,7 @@ module RDKLab
 
   class API < MediaWiki::Gateway
 
-    URL = 'https://ixtrieve.fh-koeln.de/rdk_smw/api.php'.freeze
+    URL = ENV['RDK_LAB_URL'] || 'https://ixtrieve.fh-koeln.de/w/api.php'.freeze
 
     REDIRECT_RE = /^#(?:REDIRECT|WEITERLEITUNG)\s*\[\[(.*)\]\]/
 
