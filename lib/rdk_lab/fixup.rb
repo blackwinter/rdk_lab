@@ -27,6 +27,7 @@
 require 'rdk_lab'
 require 'unicode'
 require 'highline/import'
+require 'nuggets/integer/roman'
 
 module RDKLab
 
@@ -123,7 +124,7 @@ module RDKLab
 
     fix 'caption' do |content, _|
       content.gsub!(/(\[\[File:(\d{2})-(\d{4}).*?\|thumb\|)(?!RDK)(.*?)(\]\])/i) {
-        a, b, c, d, e = $1, roman($2.to_i), $3.to_i, $4, $5
+        a, b, c, d, e = $1, $2.to_i.to_roman, $3.to_i, $4, $5
         d.gsub!(/(?:\A|<\/i>)\s*(?=\d)/, '\&Abb. ')
         "#{a}RDK #{b}, #{c}, #{d}#{e}"
       }
@@ -132,7 +133,7 @@ module RDKLab
     fix 'caption2' do |content, title|
       return unless title =~ /:(\d{2})-(\d{4})/
 
-      a, b = roman($1.to_i), $2.to_i
+      a, b = $1.to_i.to_roman, $2.to_i
 
       content.gsub!(/\A(?!RDK).*/) { |match|
         "RDK #{a}, #{b}, #{match.gsub(/(?:\A|<\/i>)\s*(?=\d)/, '\&Abb. ')}"
@@ -142,7 +143,7 @@ module RDKLab
     fix 'volume/columns' do |content, title|
       columns = config(:columns)[title] or return
       content.sub!(/\[\[Band::(.*?)\|\s*\]\]/i) {
-        "[[Band::#{$1}|RDK #{roman($1.to_i)}]], #{columns}"
+        "[[Band::#{$1}|RDK #{$1.to_i.to_roman}]], #{columns}"
       }
     end
 
@@ -278,14 +279,6 @@ module RDKLab
     end
 
     private
-
-    ROMAN = { 10 => 'X', 9 => 'IX', 5 => 'V', 4 => 'IV', 1 => 'I' }
-
-    def roman(int)
-      ''.tap { |roman| ROMAN.each { |key, val|
-        until int < key; int -= key; roman << val; end
-      } }
-    end
 
     def list(content, ary, max = 20, num = 2, &block)
       num += 1 if ary.size > max * num
