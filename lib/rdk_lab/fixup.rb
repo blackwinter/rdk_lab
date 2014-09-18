@@ -151,6 +151,16 @@ module RDKLab
       content.prepend($&) if content.sub!(/(?<=\n)\[\[Band::.*\n+/i, '')
     end
 
+    fix 'volume/columns3' do |content, _|
+      content.sub!(/^(\[\[Band::.*)-/, '\1–')
+    end
+
+    fix 'volume/columns4' do |content, _|
+      content.sub!(/^\[\[Band::(\d+)\D+(\d+)(?:[–-](\d+))?\]*/) {
+        "RDK [[Band::#{$1.to_i.to_roman}]], [[Spalte::#{$2}#{"–#{$3}" if $3}]]"
+      }
+    end
+
     fix 'TOC' do |content, _|
       return if content.include?('__TOC__')
       content.sub!(/^=\s/, "__TOC__\n\n\\&") if content.scan(/^=\s/).size > 2
@@ -158,10 +168,6 @@ module RDKLab
 
     fix 'NOTOC' do |content, _|
       content.sub!(/^__TOC__\n+/, '') if content.scan(/^=\s/).size < 3
-    end
-
-    fix 'volume/columns3' do |content, _|
-      content.sub!(/^(\[\[Band::.*)-/, '\1–')
     end
 
     fix 'authors' do |content, _|
