@@ -75,6 +75,10 @@ module RDKLab
       config(:fixup_asterisk_lemma)[content]
     end
 
+    fix 'see also2' do |content, title|
+      content.sub!(/^= Siehe auch =/, '= Verweise =')
+    end
+
     fix 'see also' do |content, title|
       v = nomenclature(title)['Verweis beidseitig']
       return if v.empty?
