@@ -67,6 +67,11 @@ module RDKLab
       nil
     end
 
+    fix 'author line' do |content, _|
+      content.sub!(
+        /\n+([^\n]*\[\[Autor::(?:.*\[\[Band::)?[^\n]*)\n+/m, "\n\n\n\\1\n\n\n")
+    end
+
     fix 'empty lines' do |content, _|
       content.gsub!(/\n\n\n+/, "\n\n")
     end
