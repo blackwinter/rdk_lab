@@ -122,15 +122,6 @@ module RDKLab
       iterate_list(:categories, nil, 'c').map!(&:text)
     end
 
-    def siteinfo(refetch = false)
-      return @siteinfo if defined?(@siteinfo) && !refetch
-
-      res, _ = make_api_request('action' => 'query', 'meta' => 'siteinfo')
-
-      @siteinfo = REXML::XPath.first(
-        res, '//query/general').attributes.to_enum.to_h
-    end
-
     def sitename
       siteinfo['sitename']
     rescue MediaWiki::APIError => err
