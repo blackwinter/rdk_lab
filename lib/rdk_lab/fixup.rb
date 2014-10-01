@@ -67,6 +67,10 @@ module RDKLab
       nil
     end
 
+    fix 'category "Gestein"' do |content, _|
+      content.sub!('[[Category:Steine]]', '[[Category:Gestein]]')
+    end
+
     fix 'author line' do |content, _|
       content.sub!(
         /\n+([^\n]*\[\[Autor::(?:.*\[\[Band::)?[^\n]*)\n+/m, "\n\n\n\\1\n\n\n")
