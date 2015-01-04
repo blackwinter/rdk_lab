@@ -1,4 +1,4 @@
-require File.expand_path(%q{../lib/rdk_lab/version}, __FILE__)
+require_relative 'lib/rdk_lab/version'
 
 begin
   require 'hen'

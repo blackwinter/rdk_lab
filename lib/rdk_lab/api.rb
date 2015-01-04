@@ -3,7 +3,7 @@
 #                                                                             #
 # rdk_lab -- RDK-SMW tools                                                    #
 #                                                                             #
-# Copyright (C) 2011-2014 Jens Wille                                          #
+# Copyright (C) 2011-2015 Jens Wille                                          #
 #                                                                             #
 # Authors:                                                                    #
 #     Jens Wille <jens.wille@gmail.com>                                       #
@@ -34,7 +34,7 @@ module RDKLab
 
   class API < MediaWiki::Gateway
 
-    URL = ENV['RDK_LAB_URL'] || 'https://ixtrieve.fh-koeln.de/w/api.php'.freeze
+    URL = ENV['RDK_LAB_URL'] || 'http://rdklabor.de/w/api.php'.freeze
 
     REDIRECT_RE = /^#(?:REDIRECT|WEITERLEITUNG)\s*\[\[(.*)\]\]/
 
