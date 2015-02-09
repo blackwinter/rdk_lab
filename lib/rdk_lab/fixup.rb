@@ -47,7 +47,7 @@ module RDKLab
     rescue Exception => err
       raise if err.is_a?(SignalException)
 
-      warn "#{title}: #{err}" if title
+      warn title ? "#{title}: #{err}" : "#{err} (#{err.class})"
       raise unless agree('Continue? ')
     end
 
@@ -276,6 +276,8 @@ module RDKLab
             content.gsub!(/#{pre_re}#{tag_re % le1_re}/i) { sub[$1, $2, $3] },
             content.gsub!(/#{pre_re}(#{le1_re})\b/i)      { sub[$1, $2, $2] }
           ) })
+
+          nomenclature
         else
           abort "Invalid file: #{file}"
       end
