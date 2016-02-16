@@ -1,0 +1,71 @@
+{
+  "variables": {
+    "password": null,
+    "wikipass": null,
+    "keyboard": "us",
+    "language": "en_US.UTF-8",
+    "timezone": "Europe/Zurich",
+    "database": "rdk_lab",
+    "releases": "https://releases.wikimedia.org/mediawiki",
+    "version": "",
+    "mirror": "http://linuxsoft.cern.ch",
+    "vmname": "RDK Labor",
+    "hostif": "vboxnet0",
+    "memory": "1024",
+    "size": "40000"
+  },
+
+  "builders": [{
+    "type": "virtualbox-iso",
+    "guest_os_type": "RedHat_64",
+    "vm_name": "{{user `vmname`}}",
+    "disk_size": "{{user `size`}}",
+    "iso_url": "{{user `mirror`}}/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1503-01.iso",
+    "iso_checksum": "85bcf62462fb678adc0cec159bf8b39ab5515404bc3828c432f743a1b0b30157",
+    "iso_checksum_type": "sha256",
+    "ssh_username": "root",
+    "ssh_password": "{{user `password`}}",
+    "ssh_wait_timeout": "60m",
+    "shutdown_command": "shutdown -h now",
+    "boot_command": [
+      "<up>",
+      "<tab>",
+      " text ks=http://{{.HTTPIP}}:{{.HTTPPort}}/ks.cfg",
+      " LANGUAGE={{user `language`}}",
+      " KEYBOARD={{user `keyboard`}}",
+      " TIMEZONE={{user `timezone`}}",
+      " PASSWORD={{user `password`}}",
+      "<enter>"
+    ],
+    "http_directory": "http",
+    "format": "ova",
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"]
+    ],
+    "vboxmanage_post": [
+      ["modifyvm", "{{.Name}}",
+        "--nic2", "hostonly", "--hostonlyadapter2", "{{user `hostif`}}"]
+    ]
+  }],
+
+  "provisioners": [{
+    "type": "file",
+    "source": "upload",
+    "destination": "/tmp"
+  }, {
+    "type": "shell",
+    "scripts": [
+      "scripts/guest_additions.sh",
+      "scripts/httpd.sh",
+      "scripts/mariadb.sh",
+      "scripts/mediawiki.sh"
+    ],
+    "environment_vars": [
+      "PASSWORD={{user `password`}}",
+      "DATABASE={{user `database`}}",
+      "RELEASES={{user `releases`}}",
+      "VERSION={{user `version`}}",
+      "UPLOAD=/tmp/upload"
+    ]
+  }]
+}

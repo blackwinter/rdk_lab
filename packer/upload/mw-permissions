@@ -1,0 +1,14 @@
+#! /bin/bash
+
+[ $# -ne 1 ] && echo "Usage: $0 <path>" && exit 1
+
+setsebool -P httpd_setrlimit 1
+
+semanage fcontext -a -t httpd_user_content_t     "$1(/.*)?"
+semanage fcontext -a -t httpd_user_script_exec_t "$1/.*\.php5?"
+semanage fcontext -a -t httpd_user_script_exec_t "$1/includes/.*\.php5?"
+semanage fcontext -a -t httpd_user_rw_content_t  "$1/images(/.*)?"
+
+restorecon -RF "$1"
+
+chown -R apache: "$1"

@@ -1,0 +1,25 @@
+--- extensions/Arrays/Arrays.php~	2016-02-16 16:00:53.084827190 +0100
++++ extensions/Arrays/Arrays.php	2016-02-16 16:06:00.946827190 +0100
+@@ -566,6 +566,13 @@
+ 
+ 		$newArr = array();
+ 
++		$normalize = null;
++
++		if( preg_match( '/^\/\(\*NF(K?[CD])\)(.*)/u', $needle, $matches ) ) {
++			$normalize = constant( "Normalizer::FORM_{$matches[1]}" );
++			$needle = "/{$matches[2]}";
++		}
++
+ 		$regexFunSupport = self::hasRegexFunSupport();
+ 		if( ! self::isValidRegEx( $needle, $regexFunSupport ) ) {
+ 			$needle = '/^\s*(' . preg_quote( $needle, '/' ) . ')\s*$/';
+@@ -575,7 +582,7 @@
+ 		$total = count( $array );
+ 		for( $i = $index; $i < $total; $i++ ) {
+ 
+-			$value = $array[ $i ];
++			$value = $normalize ? Normalizer::normalize( $array[ $i ], $normalize ) : $array[ $i ];
+ 
+ 			if( preg_match( $needle, $value ) ) {
+ 				// Found something!

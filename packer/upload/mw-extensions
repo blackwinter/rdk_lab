@@ -1,0 +1,32 @@
+#! /bin/bash
+
+[ $# -lt 2 ] && echo "Usage: $0 <dir> <ext>..." && exit 1
+
+cd "$1" || exit 1; shift
+
+extdir="extensions"
+[ ! -d "$extdir" ] && echo "No such directory: $PWD/$extdir" && exit 1
+
+version="$(ls RELEASE-NOTES-* | sort -V | sed -n '$s/.*-\(.*\)\.\(.*\)/\1_\2/p')"
+[ -z "$version" ] && echo "$PWD: Could not determine release version" && exit 1
+
+pattern="extdist\.wmflabs\.org"
+extdist="https://www.mediawiki.org/wiki/Special:ExtensionDistributor?extdist_version=REL$version&extdist_name="
+
+for ext in "$@"; do
+  url="$(curl -sSL "$extdist$ext" |\
+    sed -n "/$pattern/s/.*\"\([^\"]*$pattern[^\"]*\)\".*/\1/p")"
+
+  if [ -n "$url" ]; then
+    curl -sSL "$url" | tar xzf - -C "$extdir"
+
+    dir="$extdir/$ext"
+    restorecon -RF "$dir"
+    chown -R apache: "$dir"
+
+    patch="$dir.patch"
+    [ -f "$patch" ] && patch -p0 < "$patch"
+  else
+    echo "$ext: Could not determine download URL"
+  fi
+done
