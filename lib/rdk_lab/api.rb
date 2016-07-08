@@ -3,7 +3,7 @@
 #                                                                             #
 # rdk_lab -- RDK-SMW tools                                                    #
 #                                                                             #
-# Copyright (C) 2011-2015 Jens Wille                                          #
+# Copyright (C) 2011-2016 Jens Wille                                          #
 #                                                                             #
 # Authors:                                                                    #
 #     Jens Wille <jens.wille@gmail.com>                                       #
@@ -107,11 +107,13 @@ module RDKLab
       EOT
     }
 
+    def each_page(namespace = 0, &block)
+      iterate_list(:pages, 'title', '//p', 'apnamespace' => namespace, &block)
+    end
+
     def allcontents(namespace = 0, &block)
       self.class.gather_contents(block) { |handler|
-        iterate_list(:pages, 'title', '//p',
-          'apnamespace' => namespace) { |title| handler[self, title] }
-      }
+        each_page { |title| handler[self, title] } }
     end
 
     def allimages
