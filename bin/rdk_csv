@@ -1,0 +1,7 @@
+#! /usr/bin/env ruby
+
+require 'rdk_lab/csv'
+
+[0, 1].include?(ARGV.size) ?
+  RDKLab::CSV.export(*ARGV) :
+  abort("Usage: #{$0} [<GND>]")
