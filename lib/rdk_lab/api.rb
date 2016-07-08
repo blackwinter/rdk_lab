@@ -124,6 +124,10 @@ module RDKLab
       iterate_list(:categories, nil, 'c').map!(&:text)
     end
 
+    def revision(page_title, options = {})
+      super(page_title, options.merge('rawcontinue' => ''))
+    end
+
     def sitename
       siteinfo['sitename']
     rescue MediaWiki::APIError => err
