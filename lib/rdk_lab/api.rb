@@ -139,8 +139,8 @@ module RDKLab
     def iterate_list(name, attr, res_xpath = nil, options = {}, &block)
       list, letter = "all#{name}", name[0]
 
-      iterate_query(list, res_xpath, attr, "a#{letter}continue",
-        options.merge("a#{letter}limit" => DEFAULT_LIMIT), &block)
+      iterate_query(list, res_xpath, attr, "a#{letter}continue", options
+        .merge("a#{letter}limit" => DEFAULT_LIMIT, 'rawcontinue' => ''), &block)
     end
 
     class Local
