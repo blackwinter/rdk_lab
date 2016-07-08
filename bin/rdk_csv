@@ -2,6 +2,6 @@
 
 require 'rdk_lab/csv'
 
-[0, 1].include?(ARGV.size) ?
-  RDKLab::CSV.export(*ARGV) :
-  abort("Usage: #{$0} [<GND>]")
+abort "Usage: #{$0} [<GND> [<XML>]]" unless (0..2).include?(ARGV.size)
+
+RDKLab::CSV.export(ARGV[0], ARGV[1] && File.read(ARGV[1]))

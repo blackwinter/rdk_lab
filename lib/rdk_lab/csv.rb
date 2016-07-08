@@ -39,32 +39,45 @@ module RDKLab
       new(*args).export
     end
 
-    def initialize(gnd = nil)
-      @api, @date, @gnd = API.new, Date.today.strftime('%d.%m.%Y'), {}
+    def initialize(gnd = nil, xml = nil)
+      @date, @gnd = Date.today.strftime('%d.%m.%Y'), {}
 
       ::CSV.foreach(gnd) { |row| @gnd[row[0]] = row[1] } if gnd
+
+      !xml ? @api = API.new : (require 'nokogiri'; @xml = Nokogiri.XML(xml))
     end
 
-    attr_reader :api, :date, :gnd
+    attr_reader :api, :xml, :date, :gnd
 
     def export(io = $stdout)
       csv = ::CSV.new(io) << headers
       each { |row| csv << row.to_a }
     end
 
-    def each
-      api.each_page { |title|
-        row = Row.new(self, title)
-
-        begin
-          yield row unless row.skip?
-        rescue MediaWiki::Exception => err
-          warn "#{title}: #{err} (#{err.class})"
-        end
-      }
+    def each(&block)
+      xml ? xml_each(&block) : api_each(&block)
     end
 
     private
+
+    def xml_each(&block)
+      xml.xpath('/xmlns:mediawiki/xmlns:page[xmlns:ns="0"]').each { |page|
+        yield_row(title = page.at_xpath('xmlns:title').content,
+          Row.new(self, title,
+            page.at_xpath('xmlns:revision/xmlns:text').content,
+            page.at_xpath('xmlns:revision/xmlns:id').content), &block) }
+    end
+
+    def api_each(&block)
+      api.each_page { |title| yield_row(title,
+        Row.new(self, title), MediaWiki::Exception, &block) }
+    end
+
+    def yield_row(title, row, exception = StandardError)
+      yield row unless row.skip?
+    rescue exception => err
+      warn "#{title}: #{err} (#{err.class})"
+    end
 
     def headers
       Array.new(AUTHOR_COUNT) { |i| [
@@ -111,8 +124,11 @@ module RDKLab
         lazy_attr(name) { instance_eval(&block) or note(name, 'missing') }
       end
 
-      def initialize(rc, title)
+      def initialize(rc, title, content = nil, revision = nil)
         @rc, @title, @notes = rc, title, []
+
+        @content  = content  if content
+        @revision = revision if revision
       end
 
       attr_reader :title, :notes
